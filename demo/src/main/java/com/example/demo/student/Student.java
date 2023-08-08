@@ -44,4 +44,8 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     @EqualsAndHashCode.Exclude
     private Collection<Subject> subjects;
+
+    public Integer getAge() {
+        return Period.between(dob, LocalDate.now()).getYears();
+    }
 }

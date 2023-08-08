@@ -1,6 +1,7 @@
 package com.example.demo.classroom;
 
 import com.example.demo.student.Student;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,7 @@ public class ClassRoom {
     private Long id;
     private String name;
     private Integer maxStudents;
+    @JsonIgnore
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

@@ -74,12 +74,14 @@ public class DemoApplication implements CommandLineRunner {
 
         class1.setStudents(List.of(student1, student2));
         class2.setStudents(List.of(student3));
+        classRoomRepository.saveAndFlush(class1);
+        classRoomRepository.saveAndFlush(class2);
         sub1.setStudents(List.of(student1,student3));
         sub2.setStudents(List.of(student2,student3));
         sub3.setStudents(List.of(student1,student2,student3));
-        classRoomRepository.saveAllAndFlush(List.of(class1,class2));
-        subjectRepository.saveAllAndFlush(List.of(sub1,sub2,sub3));
-        studentRepository.saveAllAndFlush(List.of(student1,student2,student3));
+        subjectRepository.saveAndFlush(sub1);
+        subjectRepository.saveAndFlush(sub2);
+        subjectRepository.saveAndFlush(sub3);
 
     }
 }

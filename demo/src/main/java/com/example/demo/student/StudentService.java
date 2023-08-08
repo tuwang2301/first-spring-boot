@@ -1,5 +1,7 @@
 package com.example.demo.student;
 
+import com.example.demo.subject.Subject;
+import com.example.demo.subject.SubjectRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private SubjectRepository subjectRepository;
     public List<Student> getStudents() {
         return studentRepository.findAll();
     }
@@ -62,5 +66,13 @@ public class StudentService {
         if(email != null && email.length() > 0 && !Objects.equals(student.getEmail(), email)){
             student.setEmail(email);
         }
+    }
+
+    public List<Student> getStudentsBySubjectId(Long subjectId) {
+
+        if(!subjectRepository.existsById(subjectId)){
+            throw new IllegalArgumentException();
+        }
+        return (List<Student>) subjectRepository.findById(subjectId).get().getStudents();
     }
 }

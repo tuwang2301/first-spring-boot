@@ -43,6 +43,9 @@ public class SubjectService {
         if(name != null && name.length() > 0 && !Objects.equals(found.get().getName(),name)){
             found.get().setName(name);
         }
+        if(credits != null ){
+            found.get().setCredits(credits);
+        }
         return 0;
     }
 
@@ -76,6 +79,6 @@ public class SubjectService {
     }
 
     public List<Subject> getSubjectsByStudentId(Long studentId) {
-        return null;
+        return studentRepository.findById(studentId).get().getSubjects().stream().toList();
     }
 }

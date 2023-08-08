@@ -20,10 +20,11 @@ public class SubjectController {
         return subjectService.getSubjects();
     }
 
-    @GetMapping("/subject/")
-    public List<Subject> getSubjects(@RequestParam Long studentId){
+    @GetMapping("/student-subjects")
+    public List<Subject> getSubjectsByStudentId(@RequestParam Long studentId){
         return subjectService.getSubjectsByStudentId(studentId);
     }
+
 
     @PostMapping("/add-subject")
     public ResponseEntity<String> addSubject(@RequestBody Subject subject){

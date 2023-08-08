@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 @RestController
 public class StudentController {
@@ -20,6 +21,17 @@ public class StudentController {
     @GetMapping("/student")
     public List<Student> getStudents() {
         return studentService.getStudents();
+    }
+    @GetMapping("/subject-students")
+    public ResponseEntity<List<Student>> getStudentsBySubjectId(@RequestParam Long subjectId) {
+        List<Student> studentList = new ArrayList<>();
+        try{
+            studentList = studentService.getStudentsBySubjectId(subjectId);
+        }catch (Exception e){
+            return  ResponseEntity.badRequest().body(null) ;
+        }
+
+        return  ResponseEntity.status(HttpStatus.OK).body(studentList) ;
     }
     @PostMapping("/add-student")
     public ResponseEntity<String> registerNewStudent(@RequestBody Student student){
