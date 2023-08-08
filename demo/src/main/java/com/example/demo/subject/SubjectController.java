@@ -20,6 +20,11 @@ public class SubjectController {
         return subjectService.getSubjects();
     }
 
+    @GetMapping("/subject/")
+    public List<Subject> getSubjects(@RequestParam Long studentId){
+        return subjectService.getSubjectsByStudentId(studentId);
+    }
+
     @PostMapping("/add-subject")
     public ResponseEntity<String> addSubject(@RequestBody Subject subject){
         try{
@@ -55,4 +60,21 @@ public class SubjectController {
         return ResponseEntity.status(HttpStatus.OK).body("Delete successfully");
 
     }
+
+    @PutMapping("/register-subjects/{studentId}")
+    public ResponseEntity<String> registerSubjects(
+            @PathVariable("studentId") Long studentId,
+            @RequestBody List<Long> subjectIds
+    ){
+        int status = subjectService.registerSubjects(studentId, subjectIds);
+        if(status == 1) {
+            return ResponseEntity.badRequest().body("Student with id " + studentId + " not found");
+        }else if(status == 2) {
+            return ResponseEntity.badRequest().body("Subject not found");
+        }else if(status == 3){
+            return ResponseEntity.badRequest().body("Student already register this subject");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("Register successfully");
+    }
+
 }

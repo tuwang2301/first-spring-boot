@@ -53,21 +53,24 @@ public class DemoApplication implements CommandLineRunner {
                 .credits(3)
                 .build();
 
-        Student student1 = new Student(
-                "Nguyen Quang Tu",
-                LocalDate.of(2003, Month.JANUARY, 23),
-                "quangtu2301@gmail.com"
-        );
-        Student student2 = new Student(
-                "Nguyen Ha Linh",
-                LocalDate.of(2000, Month.MAY, 23),
-                "halinh2305@gmail.com"
-        );
-        Student student3 = new Student(
-                "Nguyen Quang Anh",
-                LocalDate.of(2004, Month.DECEMBER, 2),
-                "quanganh0212@gmail.com"
-        );
+        Student student1 = Student.builder()
+                .name("Nguyen Quang Tu")
+                .dob(LocalDate.of(2003, Month.JANUARY, 23))
+                .email("quangtu2301@gmail.com")
+                .classRoom(class1)
+                .build();
+        Student student2 = Student.builder()
+                .name("Nguyen Ha Linh")
+                .dob(LocalDate.of(2000, Month.MAY, 23))
+                .email("halinh2305@gmail.com")
+                .classRoom(class1)
+                .build();
+        Student student3 = Student.builder()
+                .name("Nguyen Quang Anh")
+                .dob(LocalDate.of(2004, Month.DECEMBER, 2))
+                .email("quanganh0212@gmail.com")
+                .classRoom(class2)
+                .build();
 
         class1.setStudents(List.of(student1, student2));
         class2.setStudents(List.of(student3));
@@ -76,6 +79,7 @@ public class DemoApplication implements CommandLineRunner {
         sub3.setStudents(List.of(student1,student2,student3));
         classRoomRepository.saveAllAndFlush(List.of(class1,class2));
         subjectRepository.saveAllAndFlush(List.of(sub1,sub2,sub3));
+        studentRepository.saveAllAndFlush(List.of(student1,student2,student3));
 
     }
 }

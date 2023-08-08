@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 @RestController
-@RequestMapping(path = "api/v1/student")
 public class StudentController {
     @Autowired
     private StudentService studentService;
@@ -18,7 +17,7 @@ public class StudentController {
 //    public StudentController(StudentService studentService){
 //        this.studentService = studentService;
 //    }
-    @GetMapping
+    @GetMapping("/student")
     public List<Student> getStudents() {
         return studentService.getStudents();
     }
@@ -31,7 +30,7 @@ public class StudentController {
         }
         return ResponseEntity.status(HttpStatus.OK).body("Add successfully");
     }
-    @DeleteMapping(path = "{studentId}")
+    @DeleteMapping("/delete-student/{studentId}")
     public ResponseEntity<String> deleteStudent(@PathVariable("studentId") Long id){
         try{
             studentService.deleteStudent(id);
@@ -41,7 +40,7 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.OK).body("Delete successfully");
 
     }
-    @PutMapping(path = "{studentId}")
+    @PutMapping("/update-student/{studentId}")
     public ResponseEntity<String> updateStudent(
             @PathVariable("studentId") Long studentId,
             @RequestParam(required = false) String name,
