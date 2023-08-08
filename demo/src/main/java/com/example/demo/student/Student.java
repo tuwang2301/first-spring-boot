@@ -1,9 +1,15 @@
 package com.example.demo.student;
 
+import com.example.demo.classroom.ClassRoom;
+import com.example.demo.classroom.ClassRoomController;
+import com.example.demo.subject.Subject;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collection;
 
 @Entity
 @Table
@@ -23,7 +29,17 @@ public class Student {
     private LocalDate dob;
     @Transient
     private Integer age;
+    @Column(unique = true)
     private String email;
+    @ManyToOne
+    @JoinColumn(name = "classRoom_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private ClassRoom classRoom;
+
+    @ManyToMany(mappedBy = "students")
+    @EqualsAndHashCode.Exclude
+    private Collection<Subject> subjects;
 
     public Student() {
     }
@@ -32,6 +48,13 @@ public class Student {
         this.name = name;
         this.dob = dob;
         this.email = email;
+    }
+
+    public Student(String name, LocalDate dob, String email, ClassRoom classRoom) {
+        this.name = name;
+        this.dob = dob;
+        this.email = email;
+        this.classRoom = classRoom;
     }
 
     public Student(String name, LocalDate dob, String email) {
@@ -78,6 +101,10 @@ public class Student {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setClassRoom(ClassRoom classRoom) {
+        this.classRoom = classRoom;
     }
 
     @Override
