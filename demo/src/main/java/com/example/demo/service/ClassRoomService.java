@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.entities.Student;
+import com.example.demo.enumUsages.Block;
+import com.example.demo.enumUsages.ClassErrors;
+import com.example.demo.enumUsages.StudentErrors;
 import com.example.demo.repository.ClassRoomDTO;
 import com.example.demo.repository.ClassRoomRepository;
 import com.example.demo.entities.ClassRoom;
@@ -39,57 +42,61 @@ public class ClassRoomService {
     }
 
     @Transactional
-    public int joinClass(Long studentId, Long classId) {
+    public ClassErrors joinClass(Long studentId, Long classId) {
         if(!studentRepository.existsById(studentId)){
-            return 1;
+            return ClassErrors.NotFound_Student;
         }
         Student student = studentRepository.findById(studentId).get();
         if(!classRoomRepository.existsById(classId)){
-            return 2;
+            return ClassErrors.NotFound_Class;
         }
         ClassRoom classRoom = classRoomRepository.findById(classId).get();
-        if(student.getClassRoom().equals(classRoom)){
-            return 4;
+        if(student.getClassRoom() != null && student.getClassRoom().equals(classRoom)){
+            return ClassErrors.Already_Join;
         }
         if(classRoom.getMaxStudents() == classRoom.getStudents().size()){
-            return 3;
+            return ClassErrors.Full_Students;
         }
 
         classRoom.getStudents().add(student);
         classRoom.setStudents(classRoom.getStudents());
         student.setClassRoom(classRoom);
-        return 0;
+        return null;
     }
 
     @Transactional
-    public int updateClassRoom(Long classId, String newName, String newMax) {
+    public ClassErrors updateClassRoom(Long classId, String newName, String newMax, String block) {
         if(!classRoomRepository.existsById(classId)){
-            return 1;
+            return ClassErrors.NotFound_Class;
         }
         for (ClassRoom c: classRoomRepository.findAll()) {
             if(c.getId() != classId && c.getName().equalsIgnoreCase(newName)){
-                return 2;
+                return ClassErrors.Name_Exist;
             }
         }
         if(newMax != null && newMax.length()>0){
             try{
                 int max = Integer.parseInt(newMax);
                 if(max <= 0){
-                    return 4;
+                    return ClassErrors.MaxStudents_Positive;
                 }
                 ClassRoom classRoom = classRoomRepository.findById(classId).get();
                 if(max < classRoom.getStudents().size()){
-                    return 5;
+                    return ClassErrors.MaxStudents_Invalid;
                 }
                 if(newName != null && newName.length()>0)
                     classRoom.setName(newName);
                 classRoom.setMaxStudents(max);
-                return 0;
             }catch (NumberFormatException n){
-                return 3;
+                return ClassErrors.Wrong_Number_Format;
             }
         }
-        return 3;
+        try{
+            Block block1 = Block.valueOf(block);
+        }catch (Exception e){
+            return ClassErrors.Block_Invalid;
+        }
+        return null;
     }
 
     public void deleteClass(Long classId) {
@@ -97,7 +104,6 @@ public class ClassRoomService {
             throw new IllegalStateException();
         }
         ClassRoom classRoom = classRoomRepository.findById(classId).get();
-        classRoom.getStudents().clear();
         classRoomRepository.deleteById(classId);
 
     }

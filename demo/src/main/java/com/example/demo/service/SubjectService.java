@@ -2,12 +2,19 @@ package com.example.demo.service;
 
 import com.example.demo.entities.Student;
 import com.example.demo.entities.Subject;
+import com.example.demo.enumUsages.Block;
+import com.example.demo.enumUsages.ClassErrors;
+import com.example.demo.enumUsages.SubjectErrors;
+import com.example.demo.repository.StudentDTO;
 import com.example.demo.repository.StudentRepository;
+import com.example.demo.repository.SubjectDTO;
 import com.example.demo.repository.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,64 +24,130 @@ import java.util.Optional;
 public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final StudentRepository studentRepository;
+
     public List<Subject> getSubjects() {
-        return  subjectRepository.findAll();
+        return subjectRepository.findAll();
     }
 
-    public void addSubject(Subject subject) {
-        Optional<Subject> found = subjectRepository.findByName(subject.getName());
-        if(found.isPresent()){
-            throw new IllegalStateException();
+    public SubjectErrors addSubject(SubjectDTO subjectDTO) {
+        if (subjectRepository.findByName(subjectDTO.getName()).isPresent()) {
+            return SubjectErrors.Name_Exist;
         }
-        subjectRepository.save(subject);
+        try {
+            Integer credits = Integer.parseInt(subjectDTO.getCredits());
+        } catch (NumberFormatException e) {
+            return SubjectErrors.Credits_Invalid;
+        }
+        try {
+            LocalDate startTime = LocalDate.parse(subjectDTO.getStartTime());
+            if (LocalDate.now().isAfter(startTime)) {
+                return SubjectErrors.StartTime_Invalid;
+            }
+            LocalDate endTime = LocalDate.parse(subjectDTO.getEndTime());
+            if (Period.between(startTime, endTime).getMonths() < 1) {
+                return SubjectErrors.EndTime_Invalid;
+            }
+        } catch (Exception e) {
+            return SubjectErrors.Date_Invalid;
+        }
+        try{
+            Block block1 = Block.valueOf(subjectDTO.getClassBlock());
+        }catch (Exception e){
+            return SubjectErrors.Block_Invalid;
+        }
+
+        return null;
     }
+
     @Transactional
-    public int updateSubject(Long subjectId, String name, Integer credits) {
+    public SubjectErrors updateSubject(Long subjectId, SubjectDTO subjectDTO) {
         Optional<Subject> found = subjectRepository.findById(subjectId);
-        if(!found.isPresent()){
-            return 1;
+        if (!found.isPresent()) {
+            return SubjectErrors.NotFound_Subject;
         }
-        for (Subject s: subjectRepository.findAll()) {
-            if(s.getId() != subjectId && s.getName().equalsIgnoreCase(name)){
-                return 2;
+        if (LocalDate.now().isAfter(found.get().getStartTime())) {
+            return SubjectErrors.Started_Subject;
+        }
+        for (Subject s : subjectRepository.findAll()) {
+            if (s.getId() != subjectId && s.getName().equalsIgnoreCase(subjectDTO.getName())) {
+                return SubjectErrors.Name_Exist;
             }
         }
-        if(name != null && name.length() > 0 && !Objects.equals(found.get().getName(),name)){
-            found.get().setName(name);
+        if (subjectDTO.getName() != null && !subjectDTO.getName().trim().isEmpty() && subjectDTO.getName().length() > 0 && !Objects.equals(found.get().getName(), subjectDTO.getName())) {
+            found.get().setName(subjectDTO.getName());
         }
-        if(credits != null ){
-            found.get().setCredits(credits);
+        if (subjectDTO.getCredits() != null && !subjectDTO.getCredits().trim().isEmpty()) {
+            try {
+                Integer credits = Integer.parseInt(subjectDTO.getCredits());
+                found.get().setCredits(credits);
+            } catch (NumberFormatException e) {
+                return SubjectErrors.Credits_Invalid;
+            }
         }
-        return 0;
+
+        if (subjectDTO.getStartTime() != null && !subjectDTO.getStartTime().trim().isEmpty()) {
+            try {
+                LocalDate startTime = LocalDate.parse(subjectDTO.getStartTime());
+                if (LocalDate.now().isAfter(startTime)) {
+                    return SubjectErrors.StartTime_Invalid;
+                }
+                found.get().setStartTime(startTime);
+            } catch (Exception e) {
+                return SubjectErrors.Date_Invalid;
+            }
+        }
+        if (subjectDTO.getEndTime() != null && !subjectDTO.getEndTime().trim().isEmpty()) {
+            try {
+                LocalDate endTime = LocalDate.parse(subjectDTO.getEndTime());
+                if (Period.between(found.get().getStartTime(), endTime).getMonths() < 1) {
+                    return SubjectErrors.EndTime_Invalid;
+                }
+                found.get().setEndTime(endTime);
+            } catch (Exception e) {
+                return SubjectErrors.Date_Invalid;
+            }
+        }
+        try{
+            Block block1 = Block.valueOf(subjectDTO.getClassBlock());
+        }catch (Exception e){
+            return SubjectErrors.Block_Invalid;
+        }
+
+        return null;
     }
 
 
     public void deleteSubject(Long subjectId) {
         Optional<Subject> found = subjectRepository.findById(subjectId);
-        if(!found.isPresent()){
+        if (!found.isPresent()) {
             throw new IllegalStateException();
         }
         subjectRepository.deleteById(subjectId);
     }
 
     @Transactional
-    public int registerSubjects(Long studentId, List<Long> subjectIds) {
+    public SubjectErrors registerSubjects(Long studentId, Long subjectId) {
         Optional<Student> student = studentRepository.findById(studentId);
-        if(!student.isPresent()){
-            return 1;
+        if (!student.isPresent()) {
+            return SubjectErrors.NotFound_Student;
         }
-        for (Long id: subjectIds) {
-            Optional<Subject> subject = subjectRepository.findById(id);
-            if(!subject.isPresent()){
-                return 2;
-            }
-            Subject s = subject.get();
-            if(s.getStudents().contains(student.get())){
-                return 3;
-            }
-            s.getStudents().add(student.get());
+        Optional<Subject> subject = subjectRepository.findById(subjectId);
+        if (!subject.isPresent()) {
+            return SubjectErrors.NotFound_Subject;
         }
-        return 0;
+        Subject s = subject.get();
+        if (student.get().getSubjects().contains(s)) {
+            return SubjectErrors.Already_Register;
+        }
+        if (LocalDate.now().isAfter(subject.get().getEndTime())) {
+            return SubjectErrors.Over_Subject;
+        }
+        if (Period.between(subject.get().getStartTime(), LocalDate.now()).getMonths() >= 1) {
+            return SubjectErrors.Late_Register;
+        }
+        s.getStudents().add(student.get());
+        student.get().getSubjects().add(subject.get());
+        return null;
     }
 
     public List<Subject> getSubjectsByStudentId(Long studentId) {
@@ -82,26 +155,28 @@ public class SubjectService {
     }
 
     @Transactional
-    public int unregisterSubject(Long studentId, Long subjectId) {
-        if(!studentRepository.existsById(studentId)){
-            return 1;
+    public SubjectErrors unregisterSubject(Long studentId, Long subjectId) {
+        if (!studentRepository.existsById(studentId)) {
+            return SubjectErrors.NotFound_Student;
         }
         Student student = studentRepository.findById(studentId).get();
 
-        if(!subjectRepository.existsById(subjectId)){
-            return 2;
+        if (!subjectRepository.existsById(subjectId)) {
+            return SubjectErrors.NotFound_Subject;
         }
         Subject subject = subjectRepository.findById(subjectId).get();
 
-        if(!student.getSubjects().contains(subject)){
-            return 3;
+        if (!student.getSubjects().contains(subject)) {
+            return SubjectErrors.No_Register;
+        }
+
+        if (LocalDate.now().isAfter(subject.getStartTime())) {
+            return SubjectErrors.Started_Subject;
         }
 
         student.getSubjects().remove(subject);
-        student.setSubjects(student.getSubjects());
         subject.getStudents().remove(student);
-        subject.setStudents(subject.getStudents());
 
-        return 0;
+        return null;
     }
 }

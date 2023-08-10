@@ -1,8 +1,12 @@
 package com.example.demo.entities;
 
+import com.example.demo.enumUsages.Conduct;
+import com.example.demo.enumUsages.Gender;
+import com.example.demo.enumUsages.Rank;
 import com.example.demo.repository.StudentDTO;
 import com.example.demo.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,6 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Collection;
+import java.util.Random;
 
 @Entity
 @Table
@@ -29,17 +34,31 @@ public class Student {
             generator = "student_sequence"
     )
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    @Schema(required = true)
     private Long id;
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    @Schema(required = true)
     private String name;
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    @Schema(required = true)
     private LocalDate dob;
     @Transient
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
     private Integer age;
     @Column(unique = true)
+    @Schema(required = true)
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
     private String email;
+    @Schema(required = true)
+    @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    private Gender gender;
+    @Schema(required = true)
+    @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    private Rank rank;
+    @Schema(required = true)
+    @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    private Conduct conduct;
+
 
     @ManyToOne
     @JoinColumn(name = "classRoom_id")
@@ -47,7 +66,7 @@ public class Student {
     @ToString.Exclude
     private ClassRoom classRoom;
 
-    @ManyToMany(mappedBy = "students")
+    @ManyToMany
     @EqualsAndHashCode.Exclude
     private Collection<Subject> subjects;
 
@@ -59,5 +78,8 @@ public class Student {
         this.name = studentDTO.getName();
         this.dob = LocalDate.parse(studentDTO.getDob());
         this.email = studentDTO.getEmail();
+        this.gender = Gender.valueOf(studentDTO.getGender());
+        this.rank = Rank.valueOf(studentDTO.getRank());
+        this.conduct = Conduct.valueOf(studentDTO.getConduct());
     }
 }

@@ -1,7 +1,9 @@
 package com.example.demo.entities;
 
+import com.example.demo.enumUsages.Block;
 import com.example.demo.repository.ClassRoomDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,9 +25,14 @@ public class ClassRoom {
             strategy = GenerationType.SEQUENCE,
             generator = "classroom_sequence"
     )
+    @Schema(required = true)
     private Long id;
+    @Schema(required = true)
     private String name;
+    @Schema(required = true)
     private Integer maxStudents;
+    @Schema(required = true)
+    private Block classBlock;
     @JsonIgnore
     @OneToMany(mappedBy = "classRoom", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

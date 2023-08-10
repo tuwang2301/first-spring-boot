@@ -1,6 +1,10 @@
 package com.example.demo;
 
 import com.example.demo.entities.ClassRoom;
+import com.example.demo.enumUsages.Block;
+import com.example.demo.enumUsages.Conduct;
+import com.example.demo.enumUsages.Gender;
+import com.example.demo.enumUsages.Rank;
 import com.example.demo.repository.ClassRoomRepository;
 import com.example.demo.entities.Student;
 import com.example.demo.repository.StudentRepository;
@@ -34,54 +38,94 @@ public class DemoApplication implements CommandLineRunner {
         ClassRoom class1 = ClassRoom.builder()
                 .name("A1")
                 .maxStudents(30)
+                .classBlock(Block.KHTN)
                 .build();
         ClassRoom class2 = ClassRoom.builder()
                 .name("D1")
                 .maxStudents(25)
+                .classBlock(Block.KHXH)
                 .build();
 
         Subject sub1 = Subject.builder()
                 .name("Math")
                 .credits(4)
+                .startTime(LocalDate.of(2023, Month.JANUARY, 01))
+                .endTime(LocalDate.of(2023, Month.DECEMBER, 01))
+                .subjectBlock(Block.KHTN)
                 .build();
         Subject sub2 = Subject.builder()
                 .name("English")
                 .credits(2)
+                .startTime(LocalDate.of(2023, Month.SEPTEMBER, 01))
+                .endTime(LocalDate.of(2024, Month.SEPTEMBER, 01))
+                .subjectBlock(Block.KHXH)
                 .build();
         Subject sub3 = Subject.builder()
                 .name("Programming")
                 .credits(3)
+                .startTime(LocalDate.of(2023, Month.SEPTEMBER, 01))
+                .endTime(LocalDate.of(2024, Month.SEPTEMBER, 01))
+                .subjectBlock(Block.KHTN)
+                .build();
+        Subject sub4 = Subject.builder()
+                .name("Biology")
+                .credits(2)
+                .startTime(LocalDate.of(2022, Month.JANUARY, 01))
+                .endTime(LocalDate.of(2023, Month.JANUARY, 01))
+                .subjectBlock(Block.KHTN)
+                .build();
+        Subject sub5 = Subject.builder()
+                .name("Geography")
+                .credits(2)
+                .startTime(LocalDate.of(2023, Month.AUGUST, 05))
+                .endTime(LocalDate.of(2024, Month.AUGUST, 05))
+                .subjectBlock(Block.KHXH)
                 .build();
 
         Student student1 = Student.builder()
                 .name("Nguyen Quang Tu")
                 .dob(LocalDate.of(2003, Month.JANUARY, 23))
                 .email("quangtu2301@gmail.com")
+                .gender(Gender.Male)
+                .rank(Rank.Excellent)
+                .conduct(Conduct.Good)
                 .classRoom(class1)
                 .build();
         Student student2 = Student.builder()
                 .name("Nguyen Ha Linh")
                 .dob(LocalDate.of(2000, Month.MAY, 23))
                 .email("halinh2305@gmail.com")
+                .gender(Gender.Female)
+                .rank(Rank.Good)
+                .conduct(Conduct.Good)
                 .classRoom(class1)
                 .build();
         Student student3 = Student.builder()
                 .name("Nguyen Quang Anh")
                 .dob(LocalDate.of(2004, Month.DECEMBER, 2))
                 .email("quanganh0212@gmail.com")
+                .gender(Gender.Unknown)
+                .rank(Rank.Medium)
+                .conduct(Conduct.Bad)
                 .classRoom(class2)
                 .build();
 
+//        Teacher teacher1 = Teacher.builder()
+//                .name("Co giao A")
+//                .dob(LocalDate.of(1990, Month.JANUARY, 1))
+//                .email("cogiaoa@gmail")
+//                .build();
+
         class1.setStudents(List.of(student1, student2));
         class2.setStudents(List.of(student3));
-        classRoomRepository.saveAndFlush(class1);
-        classRoomRepository.saveAndFlush(class2);
+        classRoomRepository.saveAllAndFlush(List.of(class1, class2));
         sub1.setStudents(List.of(student1,student3));
         sub2.setStudents(List.of(student2,student3));
         sub3.setStudents(List.of(student1,student2,student3));
-        subjectRepository.saveAndFlush(sub1);
-        subjectRepository.saveAndFlush(sub2);
-        subjectRepository.saveAndFlush(sub3);
+        subjectRepository.saveAllAndFlush(List.of(sub1,sub2,sub3,sub4,sub5));
+        student1.setSubjects(List.of(sub1, sub3));
+        student2.setSubjects(List.of(sub2, sub3));
+        student3.setSubjects(List.of(sub1, sub2, sub3));
 
     }
 }
