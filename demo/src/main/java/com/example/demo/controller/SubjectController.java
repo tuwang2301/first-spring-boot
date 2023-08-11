@@ -1,8 +1,13 @@
 package com.example.demo.controller;
 
+import com.example.demo.entities.Student;
 import com.example.demo.entities.Subject;
 import com.example.demo.enumUsages.Block;
-import com.example.demo.enumUsages.SubjectErrors;
+import com.example.demo.errorhandler.StudentException;
+import com.example.demo.errorhandler.SubjectErrors;
+import com.example.demo.errorhandler.SubjectException;
+import com.example.demo.pagination.PaginatedResponse;
+import com.example.demo.pagination.PaginationMeta;
 import com.example.demo.repository.SubjectDTO;
 import com.example.demo.service.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,14 +32,40 @@ public class SubjectController {
 
     @GetMapping("/subject")
     @Operation(summary = "Lấy ra toàn bộ môn học")
-    public List<Subject> getSubjects() {
-        return subjectService.getSubjects();
+    public ResponseEntity<?> getSubjects(
+            @RequestParam(required = false) String subjectBlock,
+            @RequestParam(required = false) String credits,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime,
+            @RequestParam(required = false) String studentName,
+            @RequestParam(required = true, defaultValue = "1") int currentPage,
+            @RequestParam(required = true, defaultValue = "3") int pageSize
+    ) {
+        Page<Subject> subjectPage = null;
+        try {
+            subjectPage = subjectService.searchSubjects(subjectBlock, credits, startTime, endTime, studentName, currentPage, pageSize);
+            PaginationMeta paginationMeta = new PaginationMeta(
+                    currentPage,
+                    pageSize,
+                    (int) subjectPage.getTotalElements(),
+                    subjectPage.getTotalPages()
+            );
+            return ResponseEntity.ok(new ResponseObject<>("success","Search successfully",new PaginatedResponse<>(paginationMeta, subjectPage)));
+        } catch (SubjectException subjectException) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Search unsucessfully", null));
+        }
+
     }
 
     @GetMapping("/subjects-by-student/{studentId}")
     @Operation(summary = "Lấy ra toàn bộ môn học của một học sinh")
-    public List<Subject> getSubjectsByStudentId(@PathVariable Long studentId) {
-        return subjectService.getSubjectsByStudentId(studentId);
+    public ResponseEntity<?> getSubjectsByStudentId(@PathVariable Long studentId) {
+        try{
+            List<Subject> subjects = subjectService.getSubjectsByStudentId(studentId);
+            return ResponseEntity.ok(new ResponseObject<>("success","Get successfully",subjects));
+        }catch (StudentException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+        }
     }
 
 
@@ -43,26 +75,13 @@ public class SubjectController {
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = String.class))})
             , @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})
     })
-    public ResponseEntity<String> addSubject(@RequestBody SubjectDTO subjectDTO) {
-        SubjectErrors status = subjectService.addSubject(subjectDTO);
-        return switch (status) {
-            case NotFound_Subject -> null;
-            case NotFound_Student -> null;
-            case Date_Invalid -> ResponseEntity.badRequest().body("Date-time invalid");
-            case StartTime_Invalid -> ResponseEntity.badRequest().body("Start time must be after today");
-            case EndTime_Invalid ->
-                    ResponseEntity.badRequest().body("End time must be after start-time at least one month");
-            case Credits_Invalid -> ResponseEntity.badRequest().body("Credits must be integer");
-            case Block_Invalid -> ResponseEntity.badRequest().body("Block invalid. Block must be one of " + Block.values().toString());
-            case Name_Exist -> ResponseEntity.badRequest().body("Class name already exist");
-            case Already_Register -> null;
-            case No_Register -> null;
-            case Over_Subject -> ResponseEntity.badRequest().body("This subject is over");
-            case Started_Subject -> ResponseEntity.badRequest().body("This subject started so you cannot edit");
-            case Late_Register ->
-                    ResponseEntity.badRequest().body("This subject starts more than a month so you cannot register now");
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Update successfully");
-        };
+    public ResponseEntity<?> addSubject(@RequestBody SubjectDTO subjectDTO) {
+        try{
+            Subject newSubject = subjectService.addSubject(subjectDTO);
+            return ResponseEntity.ok(new ResponseObject<>("success","Add successfully", newSubject));
+        }catch (SubjectException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Add unsuccessfully",null));
+        }
     }
 
     @PutMapping("/update-subject/{subjectId}")
@@ -71,7 +90,7 @@ public class SubjectController {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = String.class)))
     })
-    public ResponseEntity<String> updateSubject(
+    public ResponseEntity<?> updateSubject(
             @PathVariable("subjectId") Long subjectId,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String credits,
@@ -81,35 +100,22 @@ public class SubjectController {
 
     ) {
         SubjectDTO subjectDTO = new SubjectDTO(name, credits, startTime, endTime, subjectBlock);
-        SubjectErrors status = subjectService.updateSubject(subjectId, subjectDTO);
-        return switch (status) {
-            case NotFound_Subject -> ResponseEntity.badRequest().body("Subject with id " + subjectId + " not found");
-            case NotFound_Student -> null;
-            case Date_Invalid -> ResponseEntity.badRequest().body("Date-time invalid");
-            case StartTime_Invalid -> ResponseEntity.badRequest().body("Start time must be after today");
-            case EndTime_Invalid ->
-                    ResponseEntity.badRequest().body("End time must be after start-time at least one month");
-            case Credits_Invalid -> ResponseEntity.badRequest().body("Credits must be integer");
-            case Block_Invalid -> ResponseEntity.badRequest().body("Block invalid. Block must be one of " + Block.values().toString());
-            case Name_Exist -> null;
-            case Already_Register -> null;
-            case No_Register -> null;
-            case Over_Subject -> ResponseEntity.badRequest().body("This subject is over");
-            case Started_Subject -> ResponseEntity.badRequest().body("This subject started so you cannot edit");
-            case Late_Register ->
-                    ResponseEntity.badRequest().body("This subject starts more than a month so you cannot register now");
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Update successfully");
-        };
+        try{
+            Subject subject = subjectService.updateSubject(subjectId, subjectDTO);
+            return ResponseEntity.ok(new ResponseObject<>("success","Update successfully",subject));
+        }catch (SubjectException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Update unsuccessfully",null));
+        }
     }
 
     @DeleteMapping("/delete-subject/{subjectId}")
     @Operation(summary = "Xóa môn học")
-    public ResponseEntity<String> deleteSubject(@PathVariable Long subjectId) {
+    public ResponseEntity<?> deleteSubject(@PathVariable Long subjectId) {
         try {
             subjectService.deleteSubject(subjectId);
-            return ResponseEntity.status(HttpStatus.OK).body("Delete successfully");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body("Subject with id " + subjectId + " does not exist");
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseObject<>("success","Delete successfully",null));
+        } catch (SubjectException e) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",e.getSubjectErrors().getMessage(),"Delete unsuccessfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("There are students register this subject, so you cannot delete");
@@ -120,29 +126,18 @@ public class SubjectController {
 
     @PutMapping("/register-subject")
     @Operation(summary = "Đăng kí môn học")
-    public ResponseEntity<String> registerSubjects(
+    public ResponseEntity<?> registerSubjects(
             @RequestParam Long studentId,
             @RequestParam Long subjectId
     ) {
-        SubjectErrors status = subjectService.registerSubjects(studentId, subjectId);
-        return switch (status) {
-            case NotFound_Subject -> ResponseEntity.badRequest().body("Subject with id " + subjectId + " not found");
-            case NotFound_Student -> ResponseEntity.badRequest().body("Student with id " + studentId + " not found");
-            case Date_Invalid -> null;
-            case StartTime_Invalid -> null;
-            case EndTime_Invalid -> null;
-            case Credits_Invalid -> null;
-            case Block_Invalid -> null;
-            case Name_Exist -> null;
-            case Already_Register ->
-                    ResponseEntity.badRequest().body("Student with id " + studentId + " already register this subject");
-            case No_Register -> null;
-            case Over_Subject -> ResponseEntity.badRequest().body("This subject is over");
-            case Started_Subject -> null;
-            case Late_Register ->
-                    ResponseEntity.badRequest().body("This subject starts more than a month so you cannot register now");
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Register successfully");
-        };
+        try{
+            Student student = subjectService.registerSubjects(studentId, subjectId);
+            return ResponseEntity.ok(new ResponseObject<>("success","Register successfully",student));
+        }catch (SubjectException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), null));
+        }catch (StudentException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+        }
     }
 
     @PutMapping("/unregister-subject")
@@ -151,26 +146,14 @@ public class SubjectController {
             @RequestParam Long studentId,
             @RequestParam Long subjectId
     ) {
-        SubjectErrors status = subjectService.unregisterSubject(studentId, subjectId);
-        return switch (status) {
-            case NotFound_Subject -> ResponseEntity.badRequest().body("Subject with id " + subjectId + " not found");
-            case NotFound_Student -> ResponseEntity.badRequest().body("Student with id " + studentId + " not found");
-            case Date_Invalid -> null;
-            case StartTime_Invalid -> null;
-            case EndTime_Invalid -> null;
-            case Credits_Invalid -> null;
-            case Block_Invalid -> null;
-            case Name_Exist -> null;
-            case Already_Register ->
-                    ResponseEntity.badRequest().body("Student with id " + studentId + " already register this subject");
-            case No_Register ->
-                    ResponseEntity.badRequest().body("Student with id " + studentId + " has not register this subject");
-            case Over_Subject -> ResponseEntity.badRequest().body("This subject is over");
-            case Started_Subject -> ResponseEntity.badRequest().body("This subject started so you cannot unregister.");
-            case Late_Register ->
-                    ResponseEntity.badRequest().body("This subject starts more than a month so you cannot register now");
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Unregister successfully");
-        };
+        try{
+            Student student = subjectService.unregisterSubject(studentId, subjectId);
+            return ResponseEntity.ok(new ResponseObject<>("success","Unregister successfully", student));
+        }catch (SubjectException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), null));
+        }catch (StudentException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+        }
     }
 
 }

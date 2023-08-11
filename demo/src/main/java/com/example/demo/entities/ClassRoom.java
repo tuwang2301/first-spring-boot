@@ -28,6 +28,7 @@ public class ClassRoom {
     @Schema(required = true)
     private Long id;
     @Schema(required = true)
+    @Column(unique = true)
     private String name;
     @Schema(required = true)
     private Integer maxStudents;

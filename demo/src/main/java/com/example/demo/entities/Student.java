@@ -4,6 +4,7 @@ import com.example.demo.enumUsages.Conduct;
 import com.example.demo.enumUsages.Gender;
 import com.example.demo.enumUsages.Rank;
 import com.example.demo.repository.StudentDTO;
+import com.example.demo.validate.ValidEnumValue;
 import com.example.demo.view.Views;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,6 +52,7 @@ public class Student {
     private String email;
     @Schema(required = true)
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
+    @ValidEnumValue(message = "Gender is invalid", enumClass = Gender.class, allowedValues = {"Male", "Female", "Unknown"})
     private Gender gender;
     @Schema(required = true)
     @JsonView({Views.StudentWithoutClass.class, Views.StudentWithoutSubject.class})
@@ -74,7 +76,7 @@ public class Student {
         return Period.between(dob, LocalDate.now()).getYears();
     }
 
-    public void loadFromDto(StudentDTO studentDTO){
+    public void loadFromDto(StudentDTO studentDTO) {
         this.name = studentDTO.getName();
         this.dob = LocalDate.parse(studentDTO.getDob());
         this.email = studentDTO.getEmail();

@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.entities.ClassRoom;
-import com.example.demo.enumUsages.ClassErrors;
+import com.example.demo.entities.Student;
+import com.example.demo.errorhandler.ClassErrors;
+import com.example.demo.errorhandler.ClassException;
+import com.example.demo.errorhandler.StudentException;
 import com.example.demo.repository.ClassRoomDTO;
 import com.example.demo.service.ClassRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,17 +30,13 @@ public class ClassRoomController {
     }
 
     @PostMapping("/add-classroom")
-    @Operation(summary = "Lấy ra tất cả lớp học")
+    @Operation(summary = "Thêm mới lớp học")
     public ResponseEntity<?> addClassRoom(@RequestBody ClassRoomDTO classRoomDTO) {
         try {
-            classRoomService.addClassRoom(classRoomDTO);
-            return ResponseEntity.ok("Add successfully");
-        } catch (NumberFormatException n) {
-            return ResponseEntity.badRequest().body("Wrong number format");
-        } catch (DuplicateFormatFlagsException d) {
-            return ResponseEntity.badRequest().body("Class name already exist");
-        } catch (IllegalStateException i) {
-            return ResponseEntity.badRequest().body("Max students > 0");
+            ClassRoom classRoom = classRoomService.addClassRoom(classRoomDTO);
+            return ResponseEntity.ok(new ResponseObject<>("success","Add classroom successfully",classRoom));
+        }catch (ClassException c){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
         }
     }
 
@@ -47,19 +46,14 @@ public class ClassRoomController {
             @RequestParam Long studentId,
             @RequestParam Long classId
     ) {
-        ClassErrors status = classRoomService.joinClass(studentId, classId);
-        return switch (status) {
-            case NotFound_Student -> ResponseEntity.badRequest().body("Student not exist");
-            case NotFound_Class -> ResponseEntity.badRequest().body("Class not exist");
-            case Full_Students -> ResponseEntity.badRequest().body("This class has full of students");
-            case Name_Exist -> null;
-            case Wrong_Number_Format -> null;
-            case MaxStudents_Positive -> null;
-            case MaxStudents_Invalid -> null;
-            case Already_Join -> ResponseEntity.badRequest().body("This student already join this class");
-            case null -> ResponseEntity.ok("Join successfully");
-            case Block_Invalid -> null;
-        };
+        try{
+            Student student = classRoomService.joinClass(studentId, classId);
+            return ResponseEntity.ok(new ResponseObject<>("success","Join classroom successfully",student));
+        }catch (StudentException s){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(),null));
+        }catch (ClassException c){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
+        }
     }
 
     @PutMapping("update-classroom/{classId}")
@@ -70,19 +64,12 @@ public class ClassRoomController {
             @RequestParam(required = false) String newMax,
             @RequestParam(required = false) String block
     ){
-        ClassErrors status = classRoomService.updateClassRoom(classId, newName, newMax, block);
-        return switch (status) {
-            case NotFound_Student -> null;
-            case NotFound_Class -> ResponseEntity.badRequest().body("Class not exist");
-            case Name_Exist -> ResponseEntity.badRequest().body("Class name already exist");
-            case Wrong_Number_Format -> ResponseEntity.badRequest().body("Wrong number format");
-            case MaxStudents_Positive -> ResponseEntity.badRequest().body("Max students > 0");
-            case MaxStudents_Invalid -> ResponseEntity.badRequest().body("Number of students > exist students in class");
-            case Already_Join -> null;
-            case Full_Students -> null;
-            case Block_Invalid -> ResponseEntity.badRequest().body("Block is invalid");
-            case null -> ResponseEntity.ok("Update successfuly!");
-        };
+        try{
+            ClassRoom classRoom = classRoomService.updateClassRoom(classId, newName, newMax, block);
+            return ResponseEntity.ok(new ResponseObject<>("success","Update classroom successfully",classRoom));
+        }catch (ClassException c){
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
+        }
     }
 
     @DeleteMapping("delete-classroom/{classId}")
@@ -90,9 +77,9 @@ public class ClassRoomController {
     public ResponseEntity<?> deleteClassRoom(@PathVariable Long classId){
         try{
             classRoomService.deleteClass(classId);
-            return ResponseEntity.ok("Delete successfully!");
-        }catch (IllegalStateException e){
-            return ResponseEntity.badRequest().body("Class with id " + classId + " does not exist");
+            return ResponseEntity.ok(new ResponseObject<>("success","Delete successfully",null));
+        }catch (ClassException e){
+            return ResponseEntity.badRequest().body(e.getClassErrors().getMessage());
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("There are students attending this class, so you cannot delete");

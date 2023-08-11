@@ -81,6 +81,34 @@ public class DemoApplication implements CommandLineRunner {
                 .endTime(LocalDate.of(2024, Month.AUGUST, 05))
                 .subjectBlock(Block.KHXH)
                 .build();
+        Subject sub6 = Subject.builder()
+                .name("Chemistry")
+                .credits(3)
+                .startTime(LocalDate.of(2023, Month.AUGUST, 05))
+                .endTime(LocalDate.of(2024, Month.AUGUST, 05))
+                .subjectBlock(Block.KHTN)
+                .build();
+        Subject sub7 = Subject.builder()
+                .name("Physics")
+                .credits(3)
+                .startTime(LocalDate.of(2023, Month.AUGUST, 05))
+                .endTime(LocalDate.of(2024, Month.AUGUST, 05))
+                .subjectBlock(Block.KHTN)
+                .build();
+        Subject sub8 = Subject.builder()
+                .name("Literature")
+                .credits(2)
+                .startTime(LocalDate.of(2023, Month.AUGUST, 05))
+                .endTime(LocalDate.of(2024, Month.AUGUST, 05))
+                .subjectBlock(Block.KHXH)
+                .build();
+        Subject sub9 = Subject.builder()
+                .name("Ethics")
+                .credits(4)
+                .startTime(LocalDate.of(2023, Month.AUGUST, 05))
+                .endTime(LocalDate.of(2024, Month.AUGUST, 05))
+                .subjectBlock(Block.KHXH)
+                .build();
 
         Student student1 = Student.builder()
                 .name("Nguyen Quang Tu")
@@ -109,20 +137,48 @@ public class DemoApplication implements CommandLineRunner {
                 .conduct(Conduct.Bad)
                 .classRoom(class2)
                 .build();
-
+        List<Student> studentsD1 = new ArrayList<>();
+        studentsD1.add(student3);
+        for (int i = 0; i < 24; i++) {
+            Student s = Student.builder()
+                    .name("Nguyen Quang Anh " + i)
+                    .dob(LocalDate.of(2004, Month.DECEMBER, 2))
+                    .email("quanganh0212"+i+"@gmail.com")
+                    .gender(Gender.Unknown)
+                    .rank(Rank.Medium)
+                    .conduct(Conduct.Bad)
+                    .classRoom(class2)
+                    .build();
+            studentsD1.add(s);
+        }
+        List<Student> studentsA1 = new ArrayList<>();
+        studentsA1.add(student1);
+        studentsA1.add(student2);
+        for (int i = 0; i < 28; i++) {
+            Student s = Student.builder()
+                    .name("Nguyen Van A " + i)
+                    .dob(LocalDate.of(2004, Month.DECEMBER, 2))
+                    .email("nguyenvana0212"+i+"@gmail.com")
+                    .gender(Gender.Unknown)
+                    .rank(Rank.Medium)
+                    .conduct(Conduct.Bad)
+                    .classRoom(class2)
+                    .build();
+            studentsA1.add(s);
+        }
 //        Teacher teacher1 = Teacher.builder()
 //                .name("Co giao A")
 //                .dob(LocalDate.of(1990, Month.JANUARY, 1))
 //                .email("cogiaoa@gmail")
 //                .build();
 
-        class1.setStudents(List.of(student1, student2));
-        class2.setStudents(List.of(student3));
+        class1.setStudents(studentsA1);
+        class2.setStudents(studentsD1);
         classRoomRepository.saveAllAndFlush(List.of(class1, class2));
         sub1.setStudents(List.of(student1,student3));
         sub2.setStudents(List.of(student2,student3));
         sub3.setStudents(List.of(student1,student2,student3));
-        subjectRepository.saveAllAndFlush(List.of(sub1,sub2,sub3,sub4,sub5));
+        subjectRepository.saveAllAndFlush(List.of(sub1,sub2,sub3,sub4,sub5,sub6,sub7,sub8,sub9));
         student1.setSubjects(List.of(sub1, sub3));
         student2.setSubjects(List.of(sub2, sub3));
         student3.setSubjects(List.of(sub1, sub2, sub3));

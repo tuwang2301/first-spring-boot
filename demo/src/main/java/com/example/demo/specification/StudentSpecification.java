@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.specification;
 
 import com.example.demo.entities.*;
 import com.example.demo.enumUsages.Block;
@@ -59,4 +59,9 @@ public class StudentSpecification {
         };
     }
 
+    public static Specification nameContains(String studentName) {
+        return (root, query, criteriaBuilder) -> {
+            return criteriaBuilder.like(criteriaBuilder.lower(root.get(Student_.NAME)), "%" + studentName.toLowerCase() + "%");
+        };
+    }
 }

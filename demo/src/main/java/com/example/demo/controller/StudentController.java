@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.entities.Student;
-import com.example.demo.enumUsages.*;
+import com.example.demo.errorhandler.ClassException;
+import com.example.demo.errorhandler.StudentException;
+import com.example.demo.errorhandler.SubjectException;
+import com.example.demo.pagination.PaginatedResponse;
+import com.example.demo.pagination.PaginationMeta;
 import com.example.demo.repository.StudentDTO;
 import com.example.demo.service.StudentService;
 import com.example.demo.view.Views;
@@ -12,13 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -33,30 +37,51 @@ public class StudentController {
 //    }
     @Operation(summary = "Lấy ra tất cả học sinh")
     @GetMapping("/students")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ResponseObject.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})})
     public ResponseEntity<?> getStudents(
+            @RequestParam(required = false) String studentName,
             @RequestParam(required = false) String className,
             @RequestParam(required = false) String subjectName,
-            @RequestParam(required = false) Gender gender,
-            @RequestParam(required = false) Rank rank,
-            @RequestParam(required = false) Conduct conduct,
-            @RequestParam(required = false) Block classBlock,
-            @RequestParam(required = false) Block subjectBlock
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String rank,
+            @RequestParam(required = false) String conduct,
+            @RequestParam(required = false) String classBlock,
+            @RequestParam(required = false) String subjectBlock,
+            @RequestParam(required = true, defaultValue = "1") int currentPage,
+            @RequestParam(required = true, defaultValue = "3") int pageSize
 
-            ) {
-        List<Student> students = studentService.searchStudents(className, subjectName, gender, rank, conduct, classBlock, subjectBlock);
-        MappingJacksonValue result = new MappingJacksonValue(students);
-        result.setSerializationView(Views.StudentWithoutClass.class);
-        return ResponseEntity.ok(result);
-    }
-
-    @GetMapping("/student/{studentId}")
-    public ResponseEntity<?> getStudentDetailById(@PathVariable Long studentId){
-        Student student = studentService.getStudentById(studentId);
-        if(student.equals(null)){
-            return ResponseEntity.badRequest().body("Student with id " + studentId + " not found");
+    ) {
+        try {
+            Page<Student> students = studentService.searchStudents(studentName, className, subjectName, gender, rank, conduct, classBlock, subjectBlock, currentPage, pageSize);
+            PaginationMeta meta = new PaginationMeta(
+                    currentPage,
+                    pageSize,
+                    (int) students.getTotalElements(),
+                    students.getTotalPages()
+            );
+            MappingJacksonValue result = new MappingJacksonValue(students.getContent());
+            result.setSerializationView(Views.StudentWithoutClass.class);
+            return ResponseEntity.ok(new ResponseObject<>("sucess", "Search successfully", new PaginatedResponse(meta, result)));
+        } catch (StudentException studentException) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail", studentException.getMessage(), null));
+        } catch (ClassException classException) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail", classException.getClassErrors().getMessage(), null));
+        } catch (SubjectException subjectException) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail", subjectException.getSubjectErrors().getMessage(), null));
         }
-        return ResponseEntity.ok(student);
+
     }
+
+//    @GetMapping("/student/{studentId}")
+//    public ResponseEntity<?> getStudentDetailById(@PathVariable Long studentId) {
+//        Student student = studentService.getStudentById(studentId);
+//        if (student.equals(null)) {
+//            return ResponseEntity.badRequest().body("Student with id " + studentId + " not found");
+//        }
+//        return ResponseEntity.ok(student);
+//    }
 
 //    @GetMapping("/students")
 //    public ResponseEntity<?> getStudentsBySubjectId(@PathVariable("subjectId") Long subjectId) {
@@ -72,20 +97,20 @@ public class StudentController {
 //
 //    }
 
-    @GetMapping("/students-by-classroom/{classroomId}")
-    @Operation(summary = "Lấy ra toàn bộ học sinh theo lớp học")
-    public ResponseEntity<?> getStudentsByClassRoomId(@PathVariable("classroomId") Long classRoomId) {
-        List<Student> studentList = new ArrayList<>();
-        try {
-            studentList = studentService.getStudentsByClassRoomId(classRoomId);
-            MappingJacksonValue result = new MappingJacksonValue(studentList);
-            result.setSerializationView(Views.StudentWithoutClass.class);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-    }
+//    @GetMapping("/students-by-classroom/{classroomId}")
+//    @Operation(summary = "Lấy ra toàn bộ học sinh theo lớp học")
+//    public ResponseEntity<?> getStudentsByClassRoomId(@PathVariable("classroomId") Long classRoomId) {
+//        List<Student> studentList = new ArrayList<>();
+//        try {
+//            studentList = studentService.getStudentsByClassRoomId(classRoomId);
+//            MappingJacksonValue result = new MappingJacksonValue(studentList);
+//            result.setSerializationView(Views.StudentWithoutClass.class);
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//
+//    }
 
     @Operation(summary = "Thêm mới học sinh")
     @PostMapping("/add-student")
@@ -93,32 +118,34 @@ public class StudentController {
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})})
     public ResponseEntity<?> registerNewStudent(@RequestBody StudentDTO studentDTO) {
-        StudentErrors s = studentService.addNewStudent(studentDTO);
-        return switch (s) {
-            case NotFound_Student ->
-                    ResponseEntity.badRequest().body("student with id    does not exist");
-            case Email_Taken ->
-                    ResponseEntity.badRequest().body("student with email " + studentDTO.getEmail() + " already exists");
-            case Date_Invalid -> ResponseEntity.badRequest().body("Dob " + studentDTO.getDob() + " is invalid");
-            case Gender_Invalid ->
-                    ResponseEntity.badRequest().body("Gender " + studentDTO.getGender() + " is invalid. Gender has to be one of " + Arrays.toString(Gender.values()));
-            case Rank_Invalid ->
-                    ResponseEntity.badRequest().body("Rank " + studentDTO.getRank() + " is invalid. Rank has to be one of " + Arrays.toString(Rank.values()));
-            case Conduct_Invalid ->
-                    ResponseEntity.badRequest().body("Conduct " + studentDTO.getConduct() + " is invalid. Conduct has to be one of " + Arrays.toString(Conduct.values()));
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Add successfully");
-        };
+        try {
+            Student s = studentService.addNewStudent(studentDTO);
+            return ResponseEntity.ok(new ResponseObject<>("success", "Add student successfully", s));
+        } catch (StudentException e) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail", "Add student successfully", null));
+        }
     }
+
+//    @PostMapping("/add-student-entity")
+//    @Operation(summary = "Thêm mới học sinh bằng entity")
+//    public ResponseEntity<?> addStudentByEntity(@RequestBody Student student){
+//        try{
+//            Student newStudent = studentService.addStudentByEntity(student);
+//            return ResponseEntity.ok(new ResponseObject<>("success", "Add student successfully",student));
+//        }catch (StudentException studentException){
+//            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",studentException.getStudentErrors().getMessage(),null));
+//        }
+//    }
 
     @DeleteMapping("/delete-student/{studentId}")
     @Operation(summary = "Xóa môn học")
-    public ResponseEntity<String> deleteStudent(@PathVariable("studentId") Long id) {
+    public ResponseEntity<?> deleteStudent(@PathVariable("studentId") Long id) {
         try {
             studentService.deleteStudent(id);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("student with id " + id + " does not exist");
+            return ResponseEntity.ok(new ResponseObject<>("success","Delete successfully",null));
+        } catch (StudentException e) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",e.getStudentErrors().getMessage(),"Delete unsuccessfully"));
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Delete successfully");
 
     }
 
@@ -138,20 +165,11 @@ public class StudentController {
             @RequestParam(required = false) String conduct
     ) {
         StudentDTO studentDTO = new StudentDTO(name, dob, email, gender, rank, conduct);
-        StudentErrors s = studentService.updateStudent(studentId, studentDTO);
-        return switch (s) {
-            case NotFound_Student ->
-                    ResponseEntity.badRequest().body("student with id " + studentId + " does not exist");
-            case Email_Taken ->
-                    ResponseEntity.badRequest().body("student with email " + studentDTO.getEmail() + " already exists");
-            case Date_Invalid -> ResponseEntity.badRequest().body("Dob " + studentDTO.getDob() + " is invalid");
-            case Gender_Invalid ->
-                    ResponseEntity.badRequest().body("Gender " + studentDTO.getGender() + " is invalid. Gender has to be one of " + Arrays.toString(Gender.values()));
-            case Rank_Invalid ->
-                    ResponseEntity.badRequest().body("Rank " + studentDTO.getRank() + " is invalid. Rank has to be one of " + Arrays.toString(Rank.values()));
-            case Conduct_Invalid ->
-                    ResponseEntity.badRequest().body("Conduct " + studentDTO.getConduct() + " is invalid. Conduct has to be one of " + Arrays.toString(Conduct.values()));
-            case null -> ResponseEntity.status(HttpStatus.OK).body("Update successfully");
-        };
+        try {
+            Student s = studentService.updateStudent(studentId, studentDTO);
+            return ResponseEntity.ok(new ResponseObject<>("succes", "Update student successfully", s));
+        } catch (StudentException s) {
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail", "Update student unsuccessfully", null));
+        }
     }
 }

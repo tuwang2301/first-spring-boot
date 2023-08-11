@@ -31,7 +31,7 @@ public class Subject {
     )
     @Schema(required = true)
     private Long id;
-
+    @Column(unique = true)
     @Schema(required = true)
     private String name;
     @Schema(required = true)
@@ -60,5 +60,6 @@ public class Subject {
         this.credits = Integer.parseInt(subjectDTO.getCredits());
         this.startTime = LocalDate.parse(subjectDTO.getStartTime());
         this.endTime = LocalDate.parse(subjectDTO.getEndTime());
+        this.subjectBlock = Block.valueOf(subjectDTO.getSubjectBlock());
     }
 }
