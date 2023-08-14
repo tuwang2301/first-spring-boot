@@ -1,7 +1,6 @@
-package com.example.demo.repository;
+package com.example.demo.subject;
 
-import com.example.demo.entities.Subject;
-import jakarta.validation.ConstraintValidator;
+import com.example.demo.subject.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;

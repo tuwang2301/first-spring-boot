@@ -1,4 +1,4 @@
-package com.example.demo.repository;
+package com.example.demo.subject;
 
 import com.example.demo.enumUsages.Block;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,16 +16,16 @@ public class SubjectDTO {
     @Schema(required = true)
     @NotBlank(message = "Subject name is required")
     private String name;
-    @Schema(oneOf = Block.class, required = true)
+    @Schema(required = true, maxLength = 4)
     private String subjectBlock;
-    @Schema(required = true)
+    @Schema(required = true, format = "int64")
     private String credits;
     @Schema(format = "date-time"
-            ,example = "1990-01-01",
+            , example = "1990-01-01",
             required = true)
     private String startTime;
     @Schema(format = "date-time"
-            ,example = "1990-01-01",
+            , example = "1990-01-01",
             required = true)
     private String endTime;
 

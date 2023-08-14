@@ -1,12 +1,8 @@
-package com.example.demo.controller;
+package com.example.demo.classroom;
 
-import com.example.demo.entities.ClassRoom;
-import com.example.demo.entities.Student;
-import com.example.demo.errorhandler.ClassErrors;
-import com.example.demo.errorhandler.ClassException;
-import com.example.demo.errorhandler.StudentException;
-import com.example.demo.repository.ClassRoomDTO;
-import com.example.demo.service.ClassRoomService;
+import com.example.demo.common.ResponseObject;
+import com.example.demo.student.Student;
+import com.example.demo.student.StudentException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 
 @RestController

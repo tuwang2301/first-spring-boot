@@ -1,7 +1,7 @@
-package com.example.demo.entities;
+package com.example.demo.classroom;
 
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
-import com.example.demo.repository.ClassRoomDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;

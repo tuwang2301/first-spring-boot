@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.student;
 
 public class StudentException extends RuntimeException{
     private final StudentErrors studentErrors;

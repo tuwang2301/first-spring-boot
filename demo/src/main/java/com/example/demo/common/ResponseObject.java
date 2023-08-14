@@ -1,9 +1,11 @@
-package com.example.demo.controller;
+package com.example.demo.common;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor

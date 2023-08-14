@@ -1,7 +1,5 @@
 package com.example.demo.validate;
 
-import com.example.demo.errorhandler.StudentErrors;
-import com.example.demo.errorhandler.StudentException;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -21,10 +19,6 @@ public class EnumValueValidator implements ConstraintValidator<ValidEnumValue, E
             return true; // Let other annotations handle null value
         }
 
-        if(!allowedValues.contains(value.toString())){
-            throw new StudentException(StudentErrors.Gender_Invalid);
-        }
-
-        return true;
+        return allowedValues.contains(value.toString());
     }
 }

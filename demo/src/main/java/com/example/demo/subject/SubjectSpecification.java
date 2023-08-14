@@ -1,12 +1,9 @@
-package com.example.demo.specification;
+package com.example.demo.subject;
 
-import com.example.demo.entities.Student;
-import com.example.demo.entities.Student_;
-import com.example.demo.entities.Subject;
-import com.example.demo.entities.Subject_;
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
+import com.example.demo.student.Student_;
 import jakarta.persistence.criteria.Join;
-import org.hibernate.jpamodelgen.xml.jaxb.JoinTable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;

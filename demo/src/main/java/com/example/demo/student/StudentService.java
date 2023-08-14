@@ -1,13 +1,10 @@
-package com.example.demo.service;
+package com.example.demo.student;
 
-import com.example.demo.entities.ClassRoom;
-import com.example.demo.entities.Student;
-import com.example.demo.entities.Subject;
+import com.example.demo.classroom.ClassRoom;
+import com.example.demo.classroom.ClassRoomRepository;
+import com.example.demo.subject.Subject;
 import com.example.demo.enumUsages.*;
-import com.example.demo.errorhandler.StudentErrors;
-import com.example.demo.errorhandler.StudentException;
-import com.example.demo.repository.*;
-import com.example.demo.specification.StudentSpecification;
+import com.example.demo.subject.SubjectRepository;
 import com.example.demo.validate.Validate;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +120,7 @@ public class StudentService {
         return (List<Student>) classRoomRepository.findById(classRoomId).get().getStudents();
     }
 
-    public Page<Student> searchStudents(String studentName, String className, String subjectName, String gender, String rank, String conduct, String classBlock, String subjectBlock, int currentPage, int pageSize) {
+    public Page<StudentProjection> searchStudents(String studentName, String className, String subjectName, String gender, String rank, String conduct, String classBlock, String subjectBlock, int currentPage, int pageSize) {
         Specification spec = Specification.where(null);
 
 
@@ -157,21 +154,17 @@ public class StudentService {
             Block b = Validate.validateBlock(subjectBlock, Subject.class);
             spec = spec.and(StudentSpecification.subjectBlock(b));
         }
-
-        Page<Student> students = studentRepository.findAll(spec,PageRequest.of(currentPage-1,pageSize));
-
+        Page<StudentProjection> students = studentRepository.findAll(spec, PageRequest.of(currentPage-1, pageSize));
         return students;
-    }
-
-    public Student getStudentById(Long studentId) {
-        if (!studentRepository.existsById(studentId)) {
-            return null;
-        }
-        return studentRepository.findById(studentId).get();
     }
 
     public Student addStudentByEntity(Student student) {
         studentRepository.save(student);
         return student;
+    }
+
+
+    public List<StudentProjection> getStudentByGender(Gender gender) {
+        return studentRepository.findStudentByGender(gender);
     }
 }

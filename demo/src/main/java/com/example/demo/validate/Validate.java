@@ -1,13 +1,17 @@
 package com.example.demo.validate;
 
-import com.example.demo.entities.ClassRoom;
-import com.example.demo.entities.Student;
-import com.example.demo.entities.Subject;
+import com.example.demo.student.StudentErrors;
+import com.example.demo.student.StudentException;
+import com.example.demo.classroom.ClassErrors;
+import com.example.demo.classroom.ClassException;
+import com.example.demo.classroom.ClassRoom;
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
 import com.example.demo.enumUsages.Conduct;
 import com.example.demo.enumUsages.Gender;
 import com.example.demo.enumUsages.Rank;
-import com.example.demo.errorhandler.*;
+import com.example.demo.subject.SubjectErrors;
+import com.example.demo.subject.SubjectException;
 
 import java.time.LocalDate;
 

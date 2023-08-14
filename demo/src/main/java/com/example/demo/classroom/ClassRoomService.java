@@ -1,21 +1,15 @@
-package com.example.demo.service;
+package com.example.demo.classroom;
 
-import com.example.demo.entities.Student;
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
-import com.example.demo.errorhandler.ClassErrors;
-import com.example.demo.errorhandler.ClassException;
-import com.example.demo.errorhandler.StudentErrors;
-import com.example.demo.errorhandler.StudentException;
-import com.example.demo.repository.ClassRoomDTO;
-import com.example.demo.repository.ClassRoomRepository;
-import com.example.demo.entities.ClassRoom;
-import com.example.demo.repository.StudentRepository;
+import com.example.demo.student.StudentErrors;
+import com.example.demo.student.StudentException;
+import com.example.demo.student.StudentRepository;
 import com.example.demo.validate.Validate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 
 @Service

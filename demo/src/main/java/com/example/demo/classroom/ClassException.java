@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.classroom;
 
 public class ClassException extends RuntimeException {
     private final ClassErrors classErrors;

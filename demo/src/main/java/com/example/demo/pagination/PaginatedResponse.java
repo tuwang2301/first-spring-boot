@@ -14,7 +14,6 @@ import java.util.List;
 public class PaginatedResponse<T> {
     private PaginationMeta meta;
     private T data;
-    @JsonView(Views.StudentWithoutClass.class)
     public T getData() {
         return data;
     }

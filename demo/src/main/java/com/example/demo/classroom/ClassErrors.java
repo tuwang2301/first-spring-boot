@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.classroom;
 
 public enum ClassErrors {
     NotFound_Class("ClassRoom not found"),

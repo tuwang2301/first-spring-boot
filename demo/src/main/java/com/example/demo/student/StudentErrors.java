@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.student;
 
 import com.example.demo.enumUsages.Conduct;
 import com.example.demo.enumUsages.Gender;

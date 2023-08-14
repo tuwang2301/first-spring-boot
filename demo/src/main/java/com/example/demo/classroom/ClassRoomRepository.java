@@ -1,6 +1,6 @@
-package com.example.demo.repository;
+package com.example.demo.classroom;
 
-import com.example.demo.entities.ClassRoom;
+import com.example.demo.classroom.ClassRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

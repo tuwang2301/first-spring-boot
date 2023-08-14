@@ -1,15 +1,15 @@
 package com.example.demo;
 
-import com.example.demo.entities.ClassRoom;
+import com.example.demo.classroom.ClassRoom;
 import com.example.demo.enumUsages.Block;
 import com.example.demo.enumUsages.Conduct;
 import com.example.demo.enumUsages.Gender;
 import com.example.demo.enumUsages.Rank;
-import com.example.demo.repository.ClassRoomRepository;
-import com.example.demo.entities.Student;
-import com.example.demo.repository.StudentRepository;
-import com.example.demo.entities.Subject;
-import com.example.demo.repository.SubjectRepository;
+import com.example.demo.classroom.ClassRoomRepository;
+import com.example.demo.student.Student;
+import com.example.demo.student.StudentRepository;
+import com.example.demo.subject.Subject;
+import com.example.demo.subject.SubjectRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;

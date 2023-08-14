@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.subject;
 
 public enum SubjectErrors {
     NotFound_Subject("Subject not found"),

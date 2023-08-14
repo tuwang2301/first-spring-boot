@@ -1,15 +1,10 @@
-package com.example.demo.controller;
+package com.example.demo.subject;
 
-import com.example.demo.entities.Student;
-import com.example.demo.entities.Subject;
-import com.example.demo.enumUsages.Block;
-import com.example.demo.errorhandler.StudentException;
-import com.example.demo.errorhandler.SubjectErrors;
-import com.example.demo.errorhandler.SubjectException;
+import com.example.demo.student.Student;
+import com.example.demo.common.ResponseObject;
+import com.example.demo.student.StudentException;
 import com.example.demo.pagination.PaginatedResponse;
 import com.example.demo.pagination.PaginationMeta;
-import com.example.demo.repository.SubjectDTO;
-import com.example.demo.service.SubjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,7 +47,7 @@ public class SubjectController {
             );
             return ResponseEntity.ok(new ResponseObject<>("success","Search successfully",new PaginatedResponse<>(paginationMeta, subjectPage)));
         } catch (SubjectException subjectException) {
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Search unsucessfully", null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",subjectException.getSubjectErrors().getMessage(), null));
         }
 
     }
@@ -64,7 +59,7 @@ public class SubjectController {
             List<Subject> subjects = subjectService.getSubjectsByStudentId(studentId);
             return ResponseEntity.ok(new ResponseObject<>("success","Get successfully",subjects));
         }catch (StudentException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Get unsuccessfully"));
         }
     }
 
@@ -80,7 +75,7 @@ public class SubjectController {
             Subject newSubject = subjectService.addSubject(subjectDTO);
             return ResponseEntity.ok(new ResponseObject<>("success","Add successfully", newSubject));
         }catch (SubjectException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Add unsuccessfully",null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(),"Add unsuccessfully"));
         }
     }
 
@@ -104,7 +99,7 @@ public class SubjectController {
             Subject subject = subjectService.updateSubject(subjectId, subjectDTO);
             return ResponseEntity.ok(new ResponseObject<>("success","Update successfully",subject));
         }catch (SubjectException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail","Update unsuccessfully",null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(),"Update unsuccessfully"));
         }
     }
 
@@ -134,9 +129,9 @@ public class SubjectController {
             Student student = subjectService.registerSubjects(studentId, subjectId);
             return ResponseEntity.ok(new ResponseObject<>("success","Register successfully",student));
         }catch (SubjectException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), "Register unsuccessfully"));
         }catch (StudentException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Register unsuccessfully"));
         }
     }
 
@@ -150,9 +145,9 @@ public class SubjectController {
             Student student = subjectService.unregisterSubject(studentId, subjectId);
             return ResponseEntity.ok(new ResponseObject<>("success","Unregister successfully", student));
         }catch (SubjectException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), "Unregister unsuccessfully"));
         }catch (StudentException s){
-            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), null));
+            return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Unregister unsuccessfully"));
         }
     }
 

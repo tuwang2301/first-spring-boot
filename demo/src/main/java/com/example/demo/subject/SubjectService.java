@@ -1,20 +1,11 @@
-package com.example.demo.service;
+package com.example.demo.subject;
 
-import com.example.demo.controller.ResponseObject;
-import com.example.demo.entities.Student;
-import com.example.demo.entities.Subject;
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
-import com.example.demo.errorhandler.StudentErrors;
-import com.example.demo.errorhandler.StudentException;
-import com.example.demo.errorhandler.SubjectErrors;
-import com.example.demo.errorhandler.SubjectException;
-import com.example.demo.pagination.PaginatedResponse;
-import com.example.demo.pagination.PaginationMeta;
-import com.example.demo.repository.StudentRepository;
-import com.example.demo.repository.SubjectDTO;
-import com.example.demo.repository.SubjectRepository;
-import com.example.demo.specification.StudentSpecification;
-import com.example.demo.specification.SubjectSpecification;
+import com.example.demo.student.StudentErrors;
+import com.example.demo.student.StudentException;
+import com.example.demo.student.StudentRepository;
+import com.example.demo.student.StudentSpecification;
 import com.example.demo.validate.Validate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

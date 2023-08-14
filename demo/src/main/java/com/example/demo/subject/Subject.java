@@ -1,9 +1,8 @@
-package com.example.demo.entities;
+package com.example.demo.subject;
 
 
-import com.example.demo.entities.Student;
+import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
-import com.example.demo.repository.SubjectDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -11,7 +10,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Locale;
 
 @Data
 @Entity

@@ -1,4 +1,4 @@
-package com.example.demo.errorhandler;
+package com.example.demo.subject;
 
 public class SubjectException extends RuntimeException{
     private final SubjectErrors subjectErrors;
