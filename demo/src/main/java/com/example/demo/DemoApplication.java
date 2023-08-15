@@ -6,6 +6,10 @@ import com.example.demo.enumUsages.Conduct;
 import com.example.demo.enumUsages.Gender;
 import com.example.demo.enumUsages.Rank;
 import com.example.demo.classroom.ClassRoomRepository;
+import com.example.demo.securingweb.ApplicationUser;
+import com.example.demo.securingweb.Role;
+import com.example.demo.securingweb.RoleRepository;
+import com.example.demo.securingweb.UserRepository;
 import com.example.demo.student.Student;
 import com.example.demo.student.StudentRepository;
 import com.example.demo.subject.Subject;
@@ -15,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -32,6 +37,9 @@ public class DemoApplication implements CommandLineRunner {
     private final StudentRepository studentRepository;
     private final ClassRoomRepository classRoomRepository;
     private final SubjectRepository subjectRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
     @Transactional
     public void run(String... args) throws Exception {
@@ -182,6 +190,15 @@ public class DemoApplication implements CommandLineRunner {
         student1.setSubjects(List.of(sub1, sub3));
         student2.setSubjects(List.of(sub2, sub3));
         student3.setSubjects(List.of(sub1, sub2, sub3));
+        if(roleRepository.findByAuthority("ADMIN").isPresent()) return;
+        Role adminRole = roleRepository.save(new Role("ADMIN"));
+        roleRepository.save(new Role("USER"));
 
+        Set<Role> roles = new HashSet<>();
+        roles.add(adminRole);
+
+        ApplicationUser admin = new ApplicationUser(1L, "admin", passwordEncoder.encode("password"),roles);
+
+        userRepository.save(admin);
     }
 }
