@@ -22,10 +22,11 @@ import java.util.List;
 @Tag(name = "Subject", description = "Subject management API")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/subject")
 public class SubjectController {
     private final SubjectService subjectService;
 
-    @GetMapping("/subject")
+    @GetMapping("/subjects")
     @Operation(summary = "Lấy ra toàn bộ môn học")
     public ResponseEntity<?> getSubjects(
             @RequestParam(required = false) String subjectBlock,

@@ -1,5 +1,7 @@
 package com.example.demo.securingweb;
 
+import com.example.demo.user.ApplicationUser;
+import com.example.demo.user.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

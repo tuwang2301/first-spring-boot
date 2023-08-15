@@ -1,5 +1,6 @@
-package com.example.demo.securingweb;
+package com.example.demo.user;
 
+import com.example.demo.securingweb.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

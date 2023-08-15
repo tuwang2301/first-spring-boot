@@ -23,6 +23,7 @@ import java.util.List;
 
 @RestController
 @Tag(name = "Student", description = "Student management API")
+@RequestMapping("/student")
 public class StudentController {
     @Autowired
     private StudentService studentService;

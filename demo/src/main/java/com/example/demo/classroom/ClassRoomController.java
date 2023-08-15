@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @Tag(name = "ClassRoom", description = "ClassRoom management API")
+@RequestMapping("/classroom")
 public class ClassRoomController {
     @Autowired
     private ClassRoomService classRoomService;

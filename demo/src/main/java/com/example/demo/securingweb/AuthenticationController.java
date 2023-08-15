@@ -1,6 +1,7 @@
 package com.example.demo.securingweb;
 
 import com.example.demo.common.ResponseObject;
+import com.example.demo.user.ApplicationUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
