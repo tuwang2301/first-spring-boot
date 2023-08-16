@@ -5,9 +5,11 @@ import com.example.demo.student.Student;
 import com.example.demo.student.StudentException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,18 +17,21 @@ import java.util.List;
 @RestController
 @Tag(name = "ClassRoom", description = "ClassRoom management API")
 @RequestMapping("/classroom")
+
 public class ClassRoomController {
     @Autowired
     private ClassRoomService classRoomService;
 
-    @GetMapping("/classroom")
+    @GetMapping("/classrooms")
     @Operation(summary = "Lấy ra tất cả lớp học")
+    @RolesAllowed({"ADMIN","STUDENT","TEACHER"})
     public List<ClassRoom> getClassRooms() {
         return classRoomService.getClassRooms();
     }
 
     @PostMapping("/add-classroom")
     @Operation(summary = "Thêm mới lớp học")
+    @RolesAllowed("ADMIN")
     public ResponseEntity<?> addClassRoom(@RequestBody ClassRoomDTO classRoomDTO) {
         try {
             ClassRoom classRoom = classRoomService.addClassRoom(classRoomDTO);
@@ -38,6 +43,7 @@ public class ClassRoomController {
 
     @PutMapping("/join-class")
     @Operation(summary = "Cho học sinh tham gia lớp học")
+    @RolesAllowed({"ADMIN","STUDENT"})
     public ResponseEntity<?> joinClassRoom(
             @RequestParam Long studentId,
             @RequestParam Long classId
@@ -54,6 +60,7 @@ public class ClassRoomController {
 
     @PutMapping("update-classroom/{classId}")
     @Operation(summary = "Cập nhật lớp học")
+    @RolesAllowed("ADMIN")
     public ResponseEntity<?> updateClassRoom(
             @PathVariable Long classId,
             @RequestParam(required = false) String newName,
@@ -70,6 +77,7 @@ public class ClassRoomController {
 
     @DeleteMapping("delete-classroom/{classId}")
     @Operation(summary = "Xóa lớp học")
+    @RolesAllowed("ADMIN")
     public ResponseEntity<?> deleteClassRoom(@PathVariable Long classId){
         try{
             classRoomService.deleteClass(classId);

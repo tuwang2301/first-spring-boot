@@ -1,5 +1,6 @@
 package com.example.demo.securingweb;
 
+import com.example.demo.enumUsages.RoleName;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,14 +18,14 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "role_id")
     private Long roleId;
-    private String authority;
+    private RoleName authority;
 
-    public Role(String authority){
+    public Role(RoleName authority){
         this.authority = authority;
     }
 
     @Override
     public String getAuthority() {
-        return this.authority;
+        return this.authority.toString();
     }
 }

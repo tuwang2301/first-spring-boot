@@ -1,10 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.classroom.ClassRoom;
-import com.example.demo.enumUsages.Block;
-import com.example.demo.enumUsages.Conduct;
-import com.example.demo.enumUsages.Gender;
-import com.example.demo.enumUsages.Rank;
+import com.example.demo.enumUsages.*;
 import com.example.demo.classroom.ClassRoomRepository;
 import com.example.demo.user.ApplicationUser;
 import com.example.demo.securingweb.Role;
@@ -191,16 +188,21 @@ public class DemoApplication implements CommandLineRunner {
         student2.setSubjects(List.of(sub2, sub3));
         student3.setSubjects(List.of(sub1, sub2, sub3));
 
-        Role adminRole = roleRepository.save(new Role("ADMIN"));
-        Role userRole = roleRepository.save(new Role("USER"));
+        Role adminRole = roleRepository.save(new Role(RoleName.ADMIN));
+        Role studentRole = roleRepository.save(new Role(RoleName.STUDENT));
+        Role teacherRole = roleRepository.save(new Role(RoleName.TEACHER));
 
         Set<Role> roles1 = new HashSet<>();
         roles1.add(adminRole);
         Set<Role> roles2 = new HashSet<>();
-        roles2.add(userRole);
+        roles2.add(studentRole);
+        Set<Role> roles3 = new HashSet<>();
+        roles3.add(adminRole);
+        roles3.add(teacherRole);
 
         ApplicationUser admin = new ApplicationUser(1L, "admin", passwordEncoder.encode("password"),roles1);
-        ApplicationUser user = new ApplicationUser(2L, "quangtu",passwordEncoder.encode("password"),roles2);
-        userRepository.saveAllAndFlush(List.of(admin,user));
+        ApplicationUser student = new ApplicationUser(2L, "quangtu",passwordEncoder.encode("password"),roles2);
+        ApplicationUser teacher = new ApplicationUser(3L, "superteacher",passwordEncoder.encode("password"),roles3);
+        userRepository.saveAllAndFlush(List.of(admin,student,teacher));
     }
 }

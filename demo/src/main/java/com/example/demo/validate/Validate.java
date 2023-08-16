@@ -1,17 +1,16 @@
 package com.example.demo.validate;
 
+import com.example.demo.enumUsages.*;
 import com.example.demo.student.StudentErrors;
 import com.example.demo.student.StudentException;
 import com.example.demo.classroom.ClassErrors;
 import com.example.demo.classroom.ClassException;
 import com.example.demo.classroom.ClassRoom;
 import com.example.demo.student.Student;
-import com.example.demo.enumUsages.Block;
-import com.example.demo.enumUsages.Conduct;
-import com.example.demo.enumUsages.Gender;
-import com.example.demo.enumUsages.Rank;
 import com.example.demo.subject.SubjectErrors;
 import com.example.demo.subject.SubjectException;
+import com.example.demo.user.UserErrors;
+import com.example.demo.user.UserException;
 
 import java.time.LocalDate;
 
@@ -75,6 +74,15 @@ public class Validate {
             return cre;
         }catch (Exception e){
             throw new SubjectException(SubjectErrors.Credits_Invalid);
+        }
+    }
+
+    public static RoleName validateRoleName(String roleName){
+        try{
+            RoleName r = RoleName.valueOf(roleName);
+            return r;
+        }catch (Exception e){
+            throw new UserException(UserErrors.RoleName_Invalid);
         }
     }
 }

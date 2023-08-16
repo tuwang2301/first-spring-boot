@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class SubjectController {
 
     @GetMapping("/subjects")
     @Operation(summary = "Lấy ra toàn bộ môn học")
+    @RolesAllowed({"ADMIN","STUDENT","TEACHER"})
     public ResponseEntity<?> getSubjects(
             @RequestParam(required = false) String subjectBlock,
             @RequestParam(required = false) String credits,
@@ -55,6 +57,7 @@ public class SubjectController {
 
     @GetMapping("/subjects-by-student/{studentId}")
     @Operation(summary = "Lấy ra toàn bộ môn học của một học sinh")
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> getSubjectsByStudentId(@PathVariable Long studentId) {
         try{
             List<Subject> subjects = subjectService.getSubjectsByStudentId(studentId);
@@ -71,6 +74,7 @@ public class SubjectController {
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = String.class))})
             , @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})
     })
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> addSubject(@RequestBody SubjectDTO subjectDTO) {
         try{
             Subject newSubject = subjectService.addSubject(subjectDTO);
@@ -86,6 +90,7 @@ public class SubjectController {
             @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(implementation = String.class)))
     })
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> updateSubject(
             @PathVariable("subjectId") Long subjectId,
             @RequestParam(required = false) String name,
@@ -106,6 +111,7 @@ public class SubjectController {
 
     @DeleteMapping("/delete-subject/{subjectId}")
     @Operation(summary = "Xóa môn học")
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> deleteSubject(@PathVariable Long subjectId) {
         try {
             subjectService.deleteSubject(subjectId);
@@ -122,6 +128,7 @@ public class SubjectController {
 
     @PutMapping("/register-subject")
     @Operation(summary = "Đăng kí môn học")
+    @RolesAllowed({"ADMIN","STUDENT"})
     public ResponseEntity<?> registerSubjects(
             @RequestParam Long studentId,
             @RequestParam Long subjectId
@@ -138,6 +145,7 @@ public class SubjectController {
 
     @PutMapping("/unregister-subject")
     @Operation(summary = "Hủy đăng kí môn học")
+    @RolesAllowed({"ADMIN","STUDENT"})
     public ResponseEntity<?> unregisterSubjects(
             @RequestParam Long studentId,
             @RequestParam Long subjectId

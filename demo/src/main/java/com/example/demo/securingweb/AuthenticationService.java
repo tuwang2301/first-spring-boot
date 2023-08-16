@@ -1,5 +1,6 @@
 package com.example.demo.securingweb;
 
+import com.example.demo.enumUsages.RoleName;
 import com.example.demo.user.ApplicationUser;
 import com.example.demo.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -31,7 +32,7 @@ public class AuthenticationService {
     private TokenService tokenService;
     public ApplicationUser registerUser(String username, String password){
         String encodedPassword = passwordEncoder.encode(password);
-        Role userRole = roleRepository.findByAuthority("USER").get();
+        Role userRole = roleRepository.findByAuthority(RoleName.STUDENT).get();
         Set<Role> authorities = new HashSet<>();
         authorities.add(userRole);
         try{

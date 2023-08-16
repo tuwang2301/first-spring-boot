@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
@@ -30,6 +31,10 @@ import com.example.demo.utils.RSAKeyProperties;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true)
 public class WebSecurityConfig {
 
     private final RSAKeyProperties keys;
@@ -58,10 +63,32 @@ public class WebSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/auth/**").permitAll();
-                    auth.requestMatchers("/admin/**").hasRole("ADMIN");
-                    auth.requestMatchers("/user/**").hasAnyRole("ADMIN", "USER");
-                    auth.anyRequest().permitAll();
+                    auth.requestMatchers(
+                            "/auth/**",
+                            "/v3/api-docs",
+                            "/v3/api-docs/**",
+                            "/swagger-resources",
+                            "/swagger-resources/**",
+                            "/configuration/ui",
+                            "configuration/security",
+                            "/swagger-ui/**",
+                            "/webjars/**",
+                            "/swagger-ui.html"
+                    ).permitAll();
+//                    auth.requestMatchers(
+//                            "/admin/**",
+//                            "/student/**",
+//                            "/subject/**",
+//                            "/classroom/**"
+//                    ).hasRole("ADMIN");
+//                    auth.requestMatchers(
+//                            "/subject/subjects?**",
+//                            "/subject/unregister-subject",
+//                            "/subject/register-subject",
+//                            "/classroom/classrooms",
+//                            "/classroom/join-class"
+//                    ).hasRole("USER");
+                    auth.anyRequest().authenticated();
                 });
         http
                 .oauth2ResourceServer()

@@ -6,17 +6,17 @@ import com.example.demo.enumUsages.Gender;
 import com.example.demo.pagination.PaginatedResponse;
 import com.example.demo.subject.SubjectException;
 import com.example.demo.pagination.PaginationMeta;
-import com.example.demo.view.Views;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +37,7 @@ public class StudentController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ResponseObject.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})})
+    @RolesAllowed({"ADMIN","TEACHER"})
     public ResponseEntity<?> getStudents(
             @RequestParam(required = false) String studentName,
             @RequestParam(required = false) String className,
@@ -106,6 +107,7 @@ public class StudentController {
 
     @Operation(summary = "Thêm mới học sinh")
     @PostMapping("/add-student")
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> registerNewStudent(@RequestBody StudentDTO studentDTO) {
         try {
             Student s = studentService.addNewStudent(studentDTO);
@@ -128,6 +130,7 @@ public class StudentController {
 
     @DeleteMapping("/delete-student/{studentId}")
     @Operation(summary = "Xóa môn học")
+    @RolesAllowed({"ADMIN"})
     public ResponseEntity<?> deleteStudent(@PathVariable("studentId") Long id) {
         try {
             studentService.deleteStudent(id);
@@ -144,6 +147,7 @@ public class StudentController {
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = String.class))}),
             @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})
     })
+    @RolesAllowed({"ADMIN","TEACHER"})
     public ResponseEntity<?> updateStudent(
             @PathVariable("studentId") Long studentId,
             @RequestParam(required = false) String name,

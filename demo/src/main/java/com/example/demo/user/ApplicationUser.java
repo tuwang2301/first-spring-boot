@@ -1,5 +1,6 @@
 package com.example.demo.user;
 
+import com.example.demo.enumUsages.RoleName;
 import com.example.demo.securingweb.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -70,4 +72,5 @@ public class ApplicationUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
