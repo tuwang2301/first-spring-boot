@@ -1,6 +1,5 @@
 package com.example.demo.user;
 
-import com.example.demo.securingweb.ApplicationUser_;
 import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {

@@ -51,6 +51,8 @@ public class SubjectController {
             return ResponseEntity.ok(new ResponseObject<>("success","Search successfully",new PaginatedResponse<>(paginationMeta, subjectPage)));
         } catch (SubjectException subjectException) {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",subjectException.getSubjectErrors().getMessage(), null));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
 
     }
@@ -64,6 +66,8 @@ public class SubjectController {
             return ResponseEntity.ok(new ResponseObject<>("success","Get successfully",subjects));
         }catch (StudentException s){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Get unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -81,6 +85,8 @@ public class SubjectController {
             return ResponseEntity.ok(new ResponseObject<>("success","Add successfully", newSubject));
         }catch (SubjectException s){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(),"Add unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -106,6 +112,8 @@ public class SubjectController {
             return ResponseEntity.ok(new ResponseObject<>("success","Update successfully",subject));
         }catch (SubjectException s){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(),"Update unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -140,6 +148,8 @@ public class SubjectController {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), "Register unsuccessfully"));
         }catch (StudentException s){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Register unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -157,6 +167,8 @@ public class SubjectController {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getSubjectErrors().getMessage(), "Unregister unsuccessfully"));
         }catch (StudentException s){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(), "Unregister unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 

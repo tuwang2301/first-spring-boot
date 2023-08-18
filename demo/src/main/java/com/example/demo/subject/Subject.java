@@ -3,11 +3,18 @@ package com.example.demo.subject;
 
 import com.example.demo.student.Student;
 import com.example.demo.enumUsages.Block;
+import com.example.demo.user.ApplicationUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -16,6 +23,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class Subject {
     @Id
     @SequenceGenerator(
@@ -50,6 +58,23 @@ public class Subject {
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     private Collection<Student> students;
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    @CreatedBy
+    private ApplicationUser createdBy;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private Timestamp createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "updated_by")
+    @LastModifiedBy
+    private ApplicationUser updatedBy;
+
+    @Column(name = "updated_at")
+    @LastModifiedDate
+    private Timestamp updatedAt;
 
 //    @OneToOne(mappedBy = "subject")
 //    private Teacher teacher;

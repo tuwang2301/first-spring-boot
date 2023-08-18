@@ -16,8 +16,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 
@@ -36,7 +38,8 @@ public class StudentController {
     @GetMapping("/students")
     @ApiResponses({
             @ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = ResponseObject.class), mediaType = "application/json")}),
-            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})})
+            @ApiResponse(responseCode = "400", content = {@Content(schema = @Schema(implementation = String.class))})
+    })
     @RolesAllowed({"ADMIN","TEACHER"})
     public ResponseEntity<?> getStudents(
             @RequestParam(required = false) String studentName,
@@ -66,6 +69,8 @@ public class StudentController {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail", classException.getClassErrors().getMessage(), null));
         } catch (SubjectException subjectException) {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail", subjectException.getSubjectErrors().getMessage(), null));
+        }catch (HttpClientErrorException.Unauthorized e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
 
     }
@@ -114,6 +119,8 @@ public class StudentController {
             return ResponseEntity.ok(new ResponseObject<>("success", "Add student successfully", s));
         } catch (StudentException e) {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail", e.getStudentErrors().getMessage(), "Add student unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -137,6 +144,8 @@ public class StudentController {
             return ResponseEntity.ok(new ResponseObject<>("success","Delete successfully",null));
         } catch (StudentException e) {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",e.getStudentErrors().getMessage(),"Delete unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
 
     }
@@ -163,6 +172,8 @@ public class StudentController {
             return ResponseEntity.ok(new ResponseObject<>("succes", "Update student successfully", s));
         } catch (StudentException s) {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail", s.getStudentErrors().getMessage(), "Update student unsuccessfully"));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 }

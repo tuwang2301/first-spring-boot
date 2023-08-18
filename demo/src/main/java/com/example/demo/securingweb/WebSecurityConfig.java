@@ -56,8 +56,12 @@ public class WebSecurityConfig {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(daoAuthenticationProvider);
     }
-
-
+    @Autowired
+    private CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
+    @Autowired
+    private CustomBearerTokenAuthenticationEntryPoint customBearerTokenAuthenticationEntryPoint;
+    @Autowired
+    private CustomBearerTokenAccessDeniedHandler customBearerTokenAccessDeniedHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -90,10 +94,13 @@ public class WebSecurityConfig {
 //                    ).hasRole("USER");
                     auth.anyRequest().authenticated();
                 });
+        http.httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(this.customBasicAuthenticationEntryPoint));
         http
                 .oauth2ResourceServer()
                 .jwt()
-                .jwtAuthenticationConverter(jwtAuthenticationConverter());
+                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                .and().authenticationEntryPoint(this.customBearerTokenAuthenticationEntryPoint)
+                .accessDeniedHandler(this.customBearerTokenAccessDeniedHandler);
         http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();

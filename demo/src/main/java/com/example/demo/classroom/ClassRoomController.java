@@ -38,6 +38,8 @@ public class ClassRoomController {
             return ResponseEntity.ok(new ResponseObject<>("success","Add classroom successfully",classRoom));
         }catch (ClassException c){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -55,6 +57,8 @@ public class ClassRoomController {
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",s.getStudentErrors().getMessage(),null));
         }catch (ClassException c){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
@@ -72,6 +76,8 @@ public class ClassRoomController {
             return ResponseEntity.ok(new ResponseObject<>("success","Update classroom successfully",classRoom));
         }catch (ClassException c){
             return ResponseEntity.badRequest().body(new ResponseObject<>("fail",c.getClassErrors().getMessage(),null));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject<>("fail",e.getMessage(),null));
         }
     }
 
